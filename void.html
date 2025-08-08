@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roosty - Личный кабинет</title>
+    <!-- Подключение Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Подключение иконок Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: black;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .content {
+            flex: 1;
+            padding-top: 30vh;
+        }
+
+        .header-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: black;
+            text-decoration: none;
+        }
+
+        .header-buttons button {
+            color: black;
+            border: 1px solid black;
+            background-color: transparent;
+            font-size: 16px;
+            padding: 8px 16px;
+            margin-left: 10px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .header-buttons button:hover {
+            background-color: black;
+            color: white;
+        }
+
+        .dropdown-menu {
+            border: 1px solid black;
+            margin-top: 8px;
+        }
+        
+        .dropdown-item {
+            padding: 8px 16px;
+        }
+        
+        .dropdown-item.logout {
+            color: #dc3545 !important;
+            font-weight: bold;
+        }
+        
+        .dropdown-item.logout:hover {
+            background-color: #dc3545 !important;
+            color: white !important;
+        }
+        
+        .menu-button {
+            border: 1px solid black;
+            background-color: transparent;
+            padding: 8px 12px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        
+        .menu-button:hover {
+            background-color: black;
+            color: white;
+        }
+
+        .user-info {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .auth-provider {
+            margin-top: 10px;
+            font-style: italic;
+            color: #666;
+        }
+        footer {
+            width: 100%;
+            background-color: #ffffff;
+            padding: 20px 0;
+            border-top: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <!-- Фиксированная шапка -->
+    <header class="header-menu">
+        <div class="container-fluid d-flex justify-content-between align-items-center py-3">
+            <!-- Левый контейнер с логотипом -->
+            <div class="d-flex align-items-center">
+                <a href="/" class="logo">Roosty</a>
+            </div>
+            <!-- Правый контейнер с кнопками -->
+            <div class="header-buttons d-flex align-items-center">
+                <div class="dropdown">
+                    <button class="menu-button dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                        <!-- В меню (замените существующий пункт) -->
+                        <li><a class="dropdown-item" href="#" id="userPageBtn"><i class="fas fa-user me-2"></i>Ваша страница</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item logout" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Выйти</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Основной контент -->
+    <div class="content">
+        <div class="container text-center">
+            <div class="row"> 
+                <div class="col">
+                    <h2 class="text-center mb-4">Добро пожаловать!</h2>
+                </div>
+            </div>
+            <div class="row justify-content-md-center">
+              <div class="col col-lg-6">
+                <div class="user-info text-start" id="userInfo">
+                    <p><strong>Имя:</strong> <span id="userName">Загрузка...</span></p>
+                    <p><strong>Email:</strong> <span id="userEmail">Загрузка...</span></p>
+                    <p class="auth-provider" id="authProvider"></p>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center">
+          <div class="row">
+            <div class="col">
+              <a href="/" class="btn btn-outline-secondary">О нас</a>
+            </div>
+            <div class="col">
+              <a href="http://google.com" class="btn btn-outline-secondary">Правовые документы</a>
+            </div>
+            <div class="col">
+              <a href="http://google.com" class="btn btn-outline-secondary">Поддержка</a>
+            </div>
+          </div>
+        </div>
+    </footer>
+
+    <!-- Подключение Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Скрипт для работы с авторизацией -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Проверяем, авторизован ли пользователь
+            const googleUser = localStorage.getItem('googleUser');
+            const yandexUser = localStorage.getItem('yandexUser');
+            
+            if (!googleUser && !yandexUser) {
+                // Если нет данных пользователя, перенаправляем на главную
+                window.location.href = '/';
+                return;
+            }
+            
+            try {
+                // Показываем информацию о пользователе
+                if (googleUser) {
+                    const user = JSON.parse(googleUser);
+                    document.getElementById('userName').textContent = user.name || 'Не указано';
+                    document.getElementById('userEmail').textContent = user.email || 'Не указано';
+                    document.getElementById('authProvider').textContent = 'Вы вошли через Google';
+                    
+                    // Сохраняем пользователя на сервере
+                    const userData = {
+                        user_id: user.sub,
+                        login: user.email,
+                        display_name: user.name,
+                        avatar_url: user.picture || ''
+                    };
+                    
+                    await saveUserData(userData);
+                    
+                } else if (yandexUser) {
+                    const user = JSON.parse(yandexUser);
+                    const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
+                    document.getElementById('userName').textContent = fullName || 'Не указано';
+                    document.getElementById('userEmail').textContent = user.default_email || 'Не указано';
+                    document.getElementById('authProvider').textContent = 'Вы вошли через Яндекс';
+                    
+                    // Сохраняем пользователя на сервере
+                    const userData = {
+                        user_id: 'ya-' + user.id,
+                        login: user.default_email,
+                        display_name: fullName,
+                        avatar_url: '' // Яндекс не дает прямую ссылку на аватар
+                    };
+                    
+                    await saveUserData(userData);
+                }
+            } catch (e) {
+                console.error('Error parsing user data:', e);
+                alert('Ошибка обработки данных пользователя: ' + e.message);
+                //window.location.href = '/';
+            }
+            
+            // Обработчик кнопки выхода
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Удаляем данные пользователя
+                localStorage.removeItem('googleUser');
+                localStorage.removeItem('googleCredential');
+                localStorage.removeItem('yandexUser');
+                
+                // Перенаправляем на главную страницу
+                window.location.href = '/';
+            });
+            
+            // Обработчик кнопки "Ваша страница"
+            document.getElementById('userPageBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const googleUser = localStorage.getItem('googleUser');
+                const yandexUser = localStorage.getItem('yandexUser');
+                
+                let userId = '';
+                if (googleUser) {
+                    const user = JSON.parse(googleUser);
+                    userId = user.sub;
+                } else if (yandexUser) {
+                    const user = JSON.parse(yandexUser);
+                    userId = 'ya-' + user.id;
+                }
+                
+                if (userId) {
+                    window.location.href = `user_page.php?user_id=${encodeURIComponent(userId)}`;
+                } else {
+                    alert('Ошибка: пользователь не идентифицирован');
+                }
+            });
+            
+            // Убираем хэш из URL если он есть
+            if (window.location.hash) {
+                history.replaceState(null, null, window.location.pathname);
+            }
+        });
+
+        // Функция для сохранения данных пользователя на сервере
+        async function saveUserData(userData) {
+            try {
+                const response = await fetch('save_user_login.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                const data = await response.json();
+                if (data.status !== 'success') {
+                    throw new Error(data.message || 'Ошибка сохранения данных пользователя');
+                }
+
+                return data;
+            } catch (error) {
+                console.error('Ошибка сохранения пользователя:', error);
+                throw error;
+            }
+        }
+    </script>
+</body>
+</html>
